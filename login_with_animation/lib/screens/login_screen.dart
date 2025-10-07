@@ -19,6 +19,27 @@ class _LoginScreenState extends State<LoginScreen> {
   SMITrigger? trigSuccess; //Animacion de exito (se emociona)
   SMITrigger? trigFail; //Animacion de fracaso (se pone sad)
 
+  // 1) FocusNode 
+  final emailFocus = FocusNode();
+  final passFocus = FocusNode();
+
+  // 2) Listeners (Oyentes/Chismosos)
+  @override
+  void initState() {
+    super.initState();
+    emailFocus.addListener((){
+      if (emailFocus.hasFocus){
+        //Manos abajo en el email
+        isHandsUp?.change(false);
+      }
+    });
+    passFocus.addListener((){
+      //manos arriba en el password
+      isHandsUp?.change(passFocus.hasFocus);
+    });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     //Consulta el tamaño de la pantalla 
@@ -53,10 +74,13 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 10),
               // Campo de texto del Email
               TextField(
+                // 3) Asignar el FocusNode
+                // Llama a la familia chismosa
+                focusNode: emailFocus,
                 onChanged: (value) {
                   if (isHandsUp != null) {
                     //No tapar los ojos al escribir el email
-                    isHandsUp!.change(false);
+                    //isHandsUp!.change(false);
                   }
                   if (isChecking == null)  return;
                   //Activar el modo chismoso
@@ -74,10 +98,13 @@ class _LoginScreenState extends State<LoginScreen> {
               const SizedBox(height: 10),
               // Campo de texto de Password
               TextField(
+                // 3) Asignar el FocusNode
+                // Llama a la familia chismosa
+                focusNode: passFocus,
                 onChanged: (value) {
                   if (isChecking != null) {
                     //No activar el modo chismoso al escribir la contraseña
-                    isChecking!.change(false);
+                    //isChecking!.change(false);
                   }
                   if (isHandsUp == null)  return;
                   //Activar el modo taparse los ojos
@@ -161,5 +188,12 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       ),
     );
+  }
+  // 4) Liberar recursos
+  @override
+  void dispose() {
+    emailFocus.dispose();
+    passFocus.dispose();
+    super.dispose();
   }
 }
