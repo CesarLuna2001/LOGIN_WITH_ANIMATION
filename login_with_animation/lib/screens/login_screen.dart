@@ -31,6 +31,58 @@ class _LoginScreenState extends State<LoginScreen> {
   // 3.2 Crear una variable timer para detener la mirada al terminar de teclear
   Timer? _typingDebounce; 
 
+  // 4.1 Declarar la variable controller 
+  final emailCtrl = TextEditingController();
+  final passCtrl = TextEditingController(); 
+  
+  // 4.2 Errores para mostrar en la UI
+  String? emailError;
+  String? passError;
+
+// 4.3 Validadores
+  bool isValidEmail(String email) {
+    final re = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$');
+    return re.hasMatch(email);
+  }
+
+  bool isValidPassword(String pass) {
+    // mínimo 8, una mayúscula, una minúscula, un dígito y un especial
+    final re = RegExp(
+      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$',
+    );
+    return re.hasMatch(pass);
+  }
+
+  // 4.4 Accion al boton
+  void _onLogin(){
+    final email = emailCtrl.text.trim();
+    final pass = passCtrl.text;
+
+    //Recalcular errores
+    final eError = isValidEmail(email) ? null : 'Email invaldio';
+    final pError = isValidPassword(pass) ? null : 'Minimo 8 caracteres, 1 mayuscula, 1 minuscula, 1 numero y 1 caracter especial'; 
+
+    // 4.5 Para avisar que hubo un cambio
+    setState(() {
+      emailError = eError;
+      passError = pError;
+    });
+
+    // 4.6 Cerrar el teclado y bajar
+    FocusScope.of(context).unfocus();
+    _typingDebounce?.cancel();
+    isChecking?.change(false); 
+    isHandsUp?.change(false); 
+    numLook?.value = 50.0; //Mirada neutral 
+
+    //4.7 Activar Triggers
+    if (eError == null && pError == null) {
+      trigSuccess?.fire();
+    } else {
+      trigFail?.fire(); 
+    }
+  }
+
 
   // 2) Listeners (Oyentes/Chismosos)
   @override
@@ -91,9 +143,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 // 3) Asignar el FocusNode
                 // Llama a la familia chismosa
                 focusNode: emailFocus,
+                // 4.8 Enlazar controller al TextField
+                controller: emailCtrl,
                 onChanged: (value) {
-                  if (isHandsUp != null) {
-                    // 2.4 implementando eñ numLopk 
+                    // 2.4 implementando el numLook 
                     //No tapar los ojos al escribir el email
                     //isHandsUp!.change(false);
                     //Estoy escribiendo
@@ -112,13 +165,15 @@ class _LoginScreenState extends State<LoginScreen> {
                       //Mirada neutra 
                       isChecking?.change(false);
                     });
-                  }
+                  
                   if (isChecking == null)  return;
                   //Activar el modo chismoso
                   isChecking!.change(true);
                 },
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
+                  // 4.9 Mostrar el texto del error
+                  errorText: emailError,
                   labelText: 'Email',
                   prefixIcon: const Icon(Icons.email),
                   border: OutlineInputBorder(
@@ -132,17 +187,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 // 3) Asignar el FocusNode
                 // Llama a la familia chismosa
                 focusNode: passFocus,
+                // 4.8 Enlazar controller al TextField
+                controller: passCtrl,
                 onChanged: (value) {
                   if (isChecking != null) {
                     //No activar el modo chismoso al escribir la contraseña
                     //isChecking!.change(false);
                   }
-                  if (isHandsUp == null)  return;
-                  //Activar el modo taparse los ojos
-                  isHandsUp!.change(true);
+
                 },
                 obscureText: !_isPasswordVisible, // Cambia según el estado
                 decoration: InputDecoration(
+                  //4.9 Mostrar el texto del error
+                  errorText: passError,
                   labelText: 'Password',
                   prefixIcon: const Icon(Icons.lock),
                   border: OutlineInputBorder(
@@ -176,15 +233,14 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               //Botton de Login
               const SizedBox(height: 10),
-              MaterialButton(onPressed: (){
-                //TODO
-              },
+              MaterialButton(onPressed: _onLogin,
                 minWidth: size.width,
                 height: 50,
                 color: Colors.purple,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)
                 ),
+                // 4.10 Llamar a la funcion de 
                 child: Text(
                   'Login', 
                   style: TextStyle(
@@ -226,6 +282,8 @@ class _LoginScreenState extends State<LoginScreen> {
     emailFocus.dispose();
     passFocus.dispose();
     _typingDebounce?.cancel();
+    emailCtrl.dispose();
+    passCtrl.dispose();
     super.dispose();
   }
 }
