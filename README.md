@@ -40,7 +40,7 @@ The project is organized as follows:
 
 ## 🎥 Demo
 
-![Login Animation Demo](assets/GIF_Graficacion.gif)
+![Login Animation Demo](login_with_animation/assets/GIF_Graficacion.gif)
 
 Rive animation used in this project: https://rive.app/marketplace/3645-7621-remix-of-login-machine/
 
