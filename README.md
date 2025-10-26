@@ -22,7 +22,7 @@ In this project, the State Machine used is called "Login Machine", and it includ
 These elements allow the character to react dynamically as the user interacts with the login form.
 
 ## 🛠️ Technologies Used
-The main technologies used in this project are:
+The main technologies used in this project are:  
 🐦 Flutter – The main framework for building cross-platform applications with a single codebase.  
 🎯 Dart – The programming language used to develop the entire logic and structure of the app.  
 🎬 Rive – Used to implement real-time animations and state machine logic.  
